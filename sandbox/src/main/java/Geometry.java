@@ -1,6 +1,6 @@
 public class Geometry {
     public static void main(String[] args) {
-        printSquareArea( 7);
+        printSquareArea(7);
         printRectangleArea(3.0, 4.0);
 
     }
@@ -14,7 +14,7 @@ public class Geometry {
         return a * b;
     }
 
-    static void printSquareArea (double side) {
+    static void printSquareArea(double side) {
         System.out.println("Площадь квадрата со стороной " + side + " = " + squareArea(side));
 
     }
