@@ -1,24 +1,32 @@
 package manager;
 
-import model.GroupData;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class ApplicationManager {
     protected WebDriver driver;
     private LoginHelper session;
-    public GroupHelper groups;
+    private GroupHelper groups;
 
-    public void init() {
+    public void init(String browser) {
         if (driver == null) {
-            driver = new FirefoxDriver();
+            if ("firefox".equals(browser)) {
+                driver = new FirefoxDriver();
+            } else if ("chrome".equals(browser)) {
+                driver = new ChromeDriver();
+            } else {
+                throw new IllegalArgumentException(String.format("Unknown browser %s", browser));
+            }
+
+
             Runtime.getRuntime().addShutdownHook(new Thread(driver::quit));
             driver.get("http://localhost/addressbook/");
             driver.manage().window().setSize(new Dimension(1345, 694));
-            session.login("admin", "secret");
+            session().login("admin", "secret");
         }
     }
 
@@ -31,7 +39,7 @@ public class ApplicationManager {
 
     public GroupHelper groups() {
         if (groups == null) {
-            groups = new GroupHelper((this));
+            groups = new GroupHelper(this);
         }
         return groups;
     }
@@ -45,27 +53,5 @@ public class ApplicationManager {
         }
     }
 
-    public void createGroup(GroupData group) {
-        driver.findElement(By.name("new")).click();
-        driver.findElement(By.name("group_name")).click();
-        driver.findElement(By.name("group_name")).sendKeys(group.name());
-        driver.findElement(By.name("group_header")).sendKeys(group.header());
-        driver.findElement(By.name("group_footer")).sendKeys(group.footer());
-        driver.findElement(By.name("submit")).click();
-        driver.findElement(By.linkText("groups")).click();
-    }
 
-    public GroupData withName(String name) {
-        return new GroupData(name, this.header, this.footer);
-    }
-
-    public void removeGroup() {
-        driver.findElement(By.name("selected[]")).click();
-        driver.findElement(By.name("delete")).click();
-        driver.findElement(By.linkText("group page")).click();
-    }
-
-    public boolean isGroupPresent() {
-        return isElementPresent(By.name("selected[]"));
-    }
 }
