@@ -7,13 +7,19 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import java.util.Properties;
+
 public class ApplicationManager {
     protected WebDriver driver;
     private LoginHelper session;
     private GroupHelper groups;
     private ContactHelper contacts;
+    private Properties properties;
+    private JdbcHelper jdbc;
 
-    public void init(String browser) {
+
+    public void init(String browser, Properties properties) {
+        this.properties = properties;
         if (driver == null) {
             if ("firefox".equals(browser)) {
                 driver = new FirefoxDriver();
@@ -25,9 +31,9 @@ public class ApplicationManager {
 
 
             Runtime.getRuntime().addShutdownHook(new Thread(driver::quit));
-            driver.get("http://localhost/addressbook/");
+            driver.get(properties.getProperty("web.baseUrl"));
             driver.manage().window().setSize(new Dimension(1345, 694));
-            session().login("admin", "secret");
+            session().login(properties.getProperty("web.username"),properties.getProperty("web.password"));
         }
     }
 
@@ -60,6 +66,13 @@ public class ApplicationManager {
         }
         return contacts;
     }
+    public JdbcHelper jdbc() {
+        if (jdbc == null) {
+            jdbc = new JdbcHelper(this);
+        }
+        return jdbc;
+    }
+
 
 
 }
